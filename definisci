@@ -1,0 +1,61 @@
+#!/bin/bash
+
+baseurl="https://www.treccani.it/vocabolario"
+echo -e "\n    Cosa? \c"
+read query	
+bold="$(tput bold)"
+italic="$(tput sitm)"
+normal="$(tput sgr 0)"
+#black=$(tput setaf 0)
+#blue=$(tput setaf 33)
+#cyan=$(tput setaf 37)
+#green=$(tput setaf 64)
+#orange=$(tput setaf 166)
+#purple=$(tput setaf 125)
+#white=$(tput setaf 15)
+#yellow=$(tput setaf 136)
+#red=$(tput setaf 124)
+
+define=$(curl -s $baseurl/$query |
+	grep "<STRONG>" |
+	sed "s/<STRONG>/$bold/g; s/<\/STRONG>/$normal/g; s/<EM>/$italic/g; s/<\/EM>/$normal/g" |
+	sed 's/<[^>]*>//g')
+
+define1=$(curl -s $baseurl/${query}1 |
+	grep "<STRONG>" |
+	sed "s/<STRONG>/$bold/g; s/<\/STRONG>/$normal/g; s/<EM>/$italic/g; s/<\/EM>/$normal/g" |
+        sed 's/<[^>]*>//g')
+
+syntax=$(curl -s $baseurl/$query |
+	grep "<strong>" |
+	grep -v "Contenuti consigliati" |
+	sed "s/<strong>/$bold/g; s/<\/strong>/$normal/g; s/<em>/$italic/g; s/<\/em>/$normal/g" |
+	sed 's/<[^>]*>//g')
+
+syntax1=$(curl -s $baseurl/${query}1 |
+	grep "<strong>" |
+	grep -v "Contenuti consigliati" |
+	sed "s/<strong>/$bold/g; s/<\/strong>/$normal/g; s/<em>/$italic/g; s/<\/em>/$normal/g" |
+	sed 's/<[^>]*>//g')
+
+if [ ! -z "$define" ]; then
+	echo -e "\n$define\n" | cut -b 10-
+fi
+
+if [ ! -z "$define1" ]; then
+	echo -e "\n$define1\n" | cut -b 10-
+fi
+
+if [ ! -z "$syntax" ]; then
+	echo -e "\n$syntax\n" | cut -b 10-
+fi
+
+if [ ! -z "$syntax1" ]; then
+	echo -e "\n$syntax1\n" | cut -b 10-
+fi
+
+if [ -z "$define" ] && [ -z "$define1" ] && [ -z "$syntax" ] && [ -z "$syntax1" ]; then
+	echo -e "\nNessun risultato.\n"
+fi
+
+$SHELL
