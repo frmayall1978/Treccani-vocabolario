@@ -1,0 +1,26 @@
+#!/bin/bash
+
+baseurl="https://www.treccani.it/vocabolario"
+titlefont="$(tput bold; tput smul)"
+italic="$(tput sitm)"
+normal="$(tput sgr 0)"
+
+if [ -z $1 ]; then
+	echo -e "\n Cosa? \c"
+	read query
+else
+	query=$1
+fi
+
+define=$(curl -s $baseurl/$query |
+	grep "<b>" |
+	sed "s/<b>/$titlefont/g; s/<\/b>/$normal/g; s/<i>/$italic/g; s/<\/i>/$normal/g" |
+	sed 's/<[^>]*>//g')
+
+if [ ! -z "$define" ]; then
+	echo -e "\n$define\n"
+else
+#	query="$(echo ${query}1)"
+#	echo -e "\n$define\n"
+	echo "\nNessun risultato.\n"
+fi
